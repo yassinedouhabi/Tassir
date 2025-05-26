@@ -31,21 +31,30 @@ function OrdersList() {
   }, []);
 
   return (
-    <div className="order-list bg-slate-100 p-6 my-6 rounded-lg">
-      <h1>Order List</h1>
+    <div className="order-list min-h-dvh rounded-lg">
+      <h1>Orders List</h1>
       <Link to="/" className="text-blue-500 underline font-bold">
         Go Back
       </Link>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 space-y-4 mt-4">
         {loading ? (
-          <div className="text-center text-gray-500">Loading orders...</div>
+          <div className="text-gray-500">Loading orders...</div>
+        ) : orders.length === 0 ? (
+          <div className="text-gray-500">No orders yet</div>
         ) : (
           orders.map((order) => (
             <div
               key={order._id}
-              className="flex flex-col justify-between bg-white p-8 rounded-lg min-h-full shadow-md text-right"
+              className="flex flex-col justify-between bg-white p-8 rounded-lg min-h-full shadow-md text-right border-2 border-slate-200"
             >
+              <div className="order-id flex items-center justify-between mb-3 gap-4 border-b border-slate-200 pb-3">
+                <span className="font-semibold text-lg"># Order ID:</span>
+                <span className="text-slate-500 font-bold">
+                  {order._id.slice(0, 8)}
+                </span>
+              </div>
+
               <div className="flex items-center justify-between mb-3 gap-4 border-b border-slate-200 pb-3">
                 <div className="flex items-center flex-row-reverse gap-2">
                   <div className="font-semibold">Customer:</div>

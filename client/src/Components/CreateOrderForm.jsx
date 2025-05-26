@@ -5,6 +5,10 @@ import FormGroup from "../Components/FormGroup";
 
 import { useOrder } from "../context/OrderContext";
 
+import { toast } from "sonner";
+
+import axios from "axios";
+
 const formFields = [
   {
     labelName: "Customer Name",
@@ -73,33 +77,85 @@ function CreateOrderForm() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    // Basic validations
+    if (!formData.customerName || formData.customerName.trim().length < 2) {
+      toast.error(
+        "Please enter a valid customer name (at least 2 characters)."
+      );
+      return;
+    }
+
+    const phonePattern = /^[+\d\s-]{7,15}$/;
+    if (!formData.customerPhone || !phonePattern.test(formData.customerPhone)) {
+      toast.error("Please enter a valid phone number.");
+      return;
+    }
+
+    if (
+      !formData.customerAddress ||
+      formData.customerAddress.trim().length < 5
+    ) {
+      toast.error(
+        "Please enter a valid delivery address (at least 5 characters)."
+      );
+      return;
+    }
+
+    if (!formData.orderType) {
+      toast.error("Please select an order type.");
+      return;
+    }
+
+    if (!formData.deliveryTime) {
+      toast.error("Please select a delivery time.");
+      return;
+    }
+
+    const deliveryDate = new Date(formData.deliveryTime);
+    if (isNaN(deliveryDate.getTime()) || deliveryDate < new Date()) {
+      toast.error("Please select a valid future delivery time.");
+      return;
+    }
+
     const orderedData = {
-      customerName: formData.customerName,
-      customerPhone: formData.customerPhone,
-      customerAddress: formData.customerAddress,
-      orderDescription: formData.orderDescription,
+      customerName: formData.customerName.trim(),
+      customerPhone: formData.customerPhone.trim(),
+      customerAddress: formData.customerAddress.trim(),
+      orderDescription: formData.orderDescription.trim(),
       orderType: formData.orderType,
-      deliveryTime: formData.deliveryTime,
-      importantNotes: formData.importantNotes,
+      deliveryTime: deliveryDate.toISOString(),
+      importantNotes: formData.importantNotes.trim(),
     };
 
     addOrder(orderedData);
-    console.log("Sending order:", orderedData);
 
-    fetch("http://localhost:5000/orders", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(orderedData),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        console.log("Server response:", data);
-        alert(data.message);
-      })
-      .catch((err) => {
-        console.error("Error:", err);
-        alert("An error occurred while sending the order");
-      });
+    const axiosPromise = axios.post(
+      "http://localhost:5000/orders",
+      orderedData
+    );
+
+    toast.promise(axiosPromise, {
+      loading: "Sending order...",
+      success: (response) => {
+        setFormData(() => {
+          const initial = {};
+          formFields.forEach((field) => {
+            initial[field.id] = "";
+          });
+          return initial;
+        });
+
+        return response.data.message || "Order sent successfully!";
+      },
+      error: (error) => {
+        console.error("Error sending order:", error);
+        return (
+          error.response?.data?.message ||
+          error.message ||
+          "Failed to send order."
+        );
+      },
+    });
   };
 
   return (
@@ -151,9 +207,10 @@ function CreateOrderForm() {
           )}
         </FormGroup>
       ))}
+
       <button
         type="submit"
-        className="cursor-pointer w-full bg-slate-800 text-white p-4"
+        className="cursor-pointer w-full rounded-full bg-slate-800 text-white p-4"
       >
         Submit
       </button>

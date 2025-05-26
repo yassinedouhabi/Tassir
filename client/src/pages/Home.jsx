@@ -15,6 +15,12 @@ function Home() {
       >
         Go To Order List
       </Link>
+      <Link
+        to="/my-orders"
+        className="orders-list-link block text-blue-500 underline font-bold"
+      >
+        My Orders
+      </Link>
     </div>
   );
 }

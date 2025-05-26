@@ -6,7 +6,7 @@ function Form({ className, children, onSubmit }) {
       onSubmit={onSubmit}
       className={
         className +
-        " max-w-md mx-auto my-6 p-6 bg-white border border-slate-300 rounded shadow-md"
+        " max-w-md mx-auto my-6 p-6 bg-white border border-slate-300 rounded-4xl shadow-md"
       }
     >
       {children}

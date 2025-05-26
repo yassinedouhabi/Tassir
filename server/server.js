@@ -52,10 +52,10 @@ app.post("/orders", async (req, res) => {
     const newOrder = new Order(orderData);
     await newOrder.save();
 
-    console.log("Received order:", orderData);
+    console.log("Received order:", newOrder);
 
     res.json({
-      message: "Order received and saved successfully!",
+      message: "Your order received successfully!",
       receivedOrder: newOrder,
     });
   } catch (error) {
