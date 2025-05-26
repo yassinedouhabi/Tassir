@@ -9,7 +9,7 @@ function AppRouter() {
     <BrowserRouter>
       <Routes>
         <Route index element={<Home />} />
-        <Route path="/create-order" element={<CreateOrder />} />
+        <Route path="/orders" element={<CreateOrder />} />
         <Route path="/orders-list" element={<OrdersList />} />
       </Routes>
     </BrowserRouter>

@@ -4,7 +4,7 @@ function Home() {
   return (
     <div className="cta">
       <Link
-        to="/create-order"
+        to="/orders"
         className="create-order-link block text-blue-500 underline font-bold"
       >
         Go To Create Your Order

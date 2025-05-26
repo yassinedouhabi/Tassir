@@ -1,8 +1,13 @@
 import AppRouter from "./router/AppRouter";
+
+import { OrderProvider } from "./context/OrderContext";
+
 function App() {
   return (
     <div className="container max-w-7xl mx-auto px-4">
-      <AppRouter />
+      <OrderProvider>
+        <AppRouter />
+      </OrderProvider>
     </div>
   );
 }

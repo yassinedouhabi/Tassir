@@ -1,5 +1,9 @@
+import { useState } from "react";
+
 import FormLayout from "../Layouts/FormLayout";
 import FormGroup from "../Components/FormGroup";
+
+import { useOrder } from "../context/OrderContext";
 
 const formFields = [
   {
@@ -47,9 +51,60 @@ const formFields = [
 ];
 
 function CreateOrderForm() {
+  const { addOrder } = useOrder();
+
+  const [formData, setFormData] = useState(() => {
+    const initial = {};
+    formFields.forEach((field) => {
+      initial[field.id] = "";
+    });
+    return initial;
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const orderedData = {
+      customerName: formData.customerName,
+      customerPhone: formData.customerPhone,
+      customerAddress: formData.customerAddress,
+      orderDescription: formData.orderDescription,
+      orderType: formData.orderType,
+      deliveryTime: formData.deliveryTime,
+      importantNotes: formData.importantNotes,
+    };
+
+    addOrder(orderedData);
+    console.log("Sending order:", orderedData);
+
+    fetch("http://localhost:5000/orders", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(orderedData),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("Server response:", data);
+        alert(data.message);
+      })
+      .catch((err) => {
+        console.error("Error:", err);
+        alert("An error occurred while sending the order");
+      });
+  };
+
   return (
-    <FormLayout className={"create-order-form"}>
-      {formFields.map((field, index) => (
+    <FormLayout onSubmit={handleSubmit} className={"create-order-form"}>
+      {formFields.map((field) => (
         <FormGroup key={field.id} className={`create-order-form__${field.id}`}>
           <label
             htmlFor={field.id}
@@ -62,6 +117,8 @@ function CreateOrderForm() {
             <textarea
               id={field.id}
               name={field.id}
+              value={formData[field.id]}
+              onChange={handleChange}
               placeholder={field.placeholder}
               className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
               rows={3}
@@ -70,6 +127,8 @@ function CreateOrderForm() {
             <select
               id={field.id}
               name={field.id}
+              value={formData[field.id]}
+              onChange={handleChange}
               className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="" disabled>
@@ -84,6 +143,8 @@ function CreateOrderForm() {
               type={field.type}
               id={field.id}
               name={field.id}
+              value={formData[field.id]}
+              onChange={handleChange}
               placeholder={field.placeholder}
               className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
@@ -92,7 +153,7 @@ function CreateOrderForm() {
       ))}
       <button
         type="submit"
-        className=" cursor-pointer w-full bg-slate-800 text-white p-4"
+        className="cursor-pointer w-full bg-slate-800 text-white p-4"
       >
         Submit
       </button>
